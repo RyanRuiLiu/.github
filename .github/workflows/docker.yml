@@ -11,7 +11,7 @@ on:
       # 归属）：由调用方经 secrets 块传入，不落在任何公开文件里。workflow_call
       # 的 with: 不支持 secrets 上下文（官方 contexts availability 表），故不作为
       # input。fork PR 拿不到 secrets 时取值为空：ACR 镜像行回退合法 local 名
-      # （metadata-action 忽略空行，PR 上 build 本就 push: false）。
+      # （metadata-action 忽略空行，PR 上 build 本就 push: false）。登录守卫不用 secrets 判断：step 级 if 不支持 secrets 上下文，push/tag 事件必来自同仓、secrets 必在。
       ACR_REGISTRY:
         required: false
       ACR_NAMESPACE:
@@ -37,7 +37,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6  # v4.7.0
-        if: github.event_name != 'pull_request' && secrets.ACR_REGISTRY != ''
+        if: github.event_name != 'pull_request'
         with:
           registry: ${{ secrets.ACR_REGISTRY }}
           username: ${{ secrets.ACR_USERNAME }}
